@@ -1,0 +1,124 @@
+DOSBox-X Win9X installation guide.
+
+This is a little guide on how to install Win9X on pretty much any SVN build (like SVN Daum, DOSBox-x, e.t.c).
+
+Requirements:
+1. Bootable DOS floppy image.
+2. Hard disk image.
+3. An installation CD or ISO image.
+4. Several hours of free time.
+
+Preparation:
+
+Step 1. Pre-configuring DOSBox.
+
+First thing is you need to edit your dosbox.conf file a bit.
+Go to [ide] section (e.g. [ide, secondary])
+It should look like this:
+
+enable=true
+pnp=true
+irq=0
+io=0
+altio=0
+int13fakeio=false
+int13fakev86io=false // enable this for CD drive emulation
+enable pio32=false
+ignore pio32=false
+cd-rom spinup time=0
+cd-rom spindown timeout=0
+cd-rom insertion delay=0
+
+You would need to enable primary and secondary IDE interfaces.
+
+Next go to [cpu] section and set up theese parameters:
+
+core=normal
+...
+cputype=pentium (or pentium_mmx)
+
+After that is done go straight to [sblaster] section.
+*NOTICE*
+Be sure that this line is set to true:
+
+enable asp=true
+
+Otherwise Windows 98 would not be able to detect your SoundBlaster card properly.
+
+If you'll be using ne2000, Gravis Ultrasound or anything that needs IRQ and/or DMA be sure that there's no conflicts
+meaning every single device has it's own and unique IRQ and DMA settings.
+
+Step 2. Obtaining images and creating HDD image.
+
+I would not post any download links to Windows images, Dos images for obvious reasons.
+By this time I assume you have proper image files or CDs.
+
+Now we would need to create our hard drive image. 
+It can be easily done with IMGMAKE tool inside DOSBox.
+All of the necessary information could be displayed with "IMGMAKE -?" command.
+Before that we need to specify the directory where we would want to place our image file.
+
+MOUNT C: "C:\%your_path%"
+C:
+
+For example, I need a 2GB image.
+
+IMGMAKE hdd.img -t hd_2gig
+
+That may take a while to create DOSBox may even hang for a moment.
+
+After that we are ready to mount our images inside DOSBox.
+*NOTICE*
+Theese line are very handy to have in [autoexec] section in your config file.
+
+IMGMOUNT C: "C:\%your_path%\hdd.img" -t hdd -ide 1m
+IMGMOUNT R: "C:\%your_path%\win9x.iso" -t iso -ide 2m
+IMGMOUNT A: "C:\%your_path%\dos622.img" -t floppy
+
+Usually if you use standard disk sizes like 1GB/2GB/500MB the geometry of your HDD would be detected automatically
+but if you need a hard drive of some specific size you should use "-size x,x,x,x" parameter with values that
+you've defined when making your hard drive image (but I strongly recommend against that and use 500MB/1GB/2GB e.t.c).
+
+Step 3. Booting and formatting your hard drive.
+(insert rm -rf joke here)
+
+After you've mounted your images next thing you would do is to boot from the floppy drive.
+
+BOOT -L A
+
+After that we would be greeted with the line "Starting MS-DOS..."
+
+First of all, we would need to go to FDISK inside MS-DOS.
+
+Then we would need to check if there's any partitions by pressing [4].
+If there is a partition we would need to delete it entering the menu by pressing [3] and following the instructions
+on the display.
+Then after reboot we boot from floppy again. We would make another primary partition by entering the first menu.
+FDISK would ask us if you want to use all the available space (of course you are) just press "Y".
+
+After another reboot we would need to format our hard drive by using this command and following the instructions
+
+FORMAT C:
+
+Job jobbed.
+
+Step 4. Running Windows 9x installation process.
+
+Now you need to go directly to your CD drive in your virtual pc.
+Usually it's drive letter "R:" but there could be some variations of which I am no certain.
+
+Now we would need to run the installation file which is usually can be started with "SETUP" line.
+Follow the instruction on your screen and after your virtual pc reboots once more simply type in
+
+BOOT -L C
+
+*NOTICE*
+This line is also handy to add in your autoexec file if you are willing to boot into Windows as soon as you launch DOSBox.
+By this point we would no longer need "IMGMOUNT A:" line so you can either delete it or comment.
+
+From this point you'll simply finish the installation process and configure your hardware inside the Guest OS.
+*NOTICE*
+For some reason the installation time is heavily reliant on process CPU priority so setting it to real-time speeds
+the installation process by a bit.
+
+This guide is open for any edits and fixes.
